@@ -1,9 +1,10 @@
 {
   "name": "@se-2/backend",
   "version": "0.0.1",
+  "typr": "module",
   "scripts": {
     "backend": "ts-node index.ts",
-    "start": "ts-node index.ts"
+    "start": "ts-node index.js"
   },
   "dependencies": {
     "ably": "^1.2.45",

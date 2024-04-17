@@ -1,12 +1,12 @@
-import express, { Request, Response, NextFunction } from "express";
-import bodyParser from "body-parser";
+import express = require("express");
+import * as bodyParser from "body-parser";
 import mongoose, { Error } from "mongoose";
-import cors from "cors";
+import * as cors from "cors";
 import * as dotenv from "dotenv";
 import helmet from "helmet";
-import morgan from "morgan";
-import http from "http";
-import Ably from "ably";
+import * as morgan from "morgan";
+import * as http from "http";
+import * as Ably from "ably";
 import * as path from "path";
 
 declare global {
