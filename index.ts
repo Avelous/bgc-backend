@@ -4,7 +4,7 @@ import mongoose, { Error } from "mongoose";
 const cors = require("cors");
 import * as dotenv from "dotenv";
 import helmet from "helmet";
-const morgan = require("morgn");
+const morgan = require("morgan");
 import * as http from "http";
 import * as Ably from "ably";
 import * as path from "path";
