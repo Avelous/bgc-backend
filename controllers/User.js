@@ -36,58 +36,53 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ably = void 0;
-var express = require("express");
-var bodyParser = require("body-parser");
-var mongoose_1 = require("mongoose");
-var cors = require("cors");
-var dotenv = require("dotenv");
-var helmet_1 = require("helmet");
-var morgan = require("morgn");
-var http = require("http");
-var Ably = require("ably");
-var path = require("path");
-var user_1 = require("./routes/user");
-var envPath = path.resolve(__dirname, "./.env");
-dotenv.config({ path: envPath });
-/* CONFIGURATIONS */
-var app = express();
-app.use(express.json());
-app.use((0, helmet_1.default)());
-app.use(helmet_1.default.crossOriginResourcePolicy({ policy: "cross-origin" }));
-app.use(morgan("common"));
-app.use(bodyParser.json({ limit: "30mb" }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
-/**Ably Setup */
-exports.ably = new Ably.Realtime({ key: process.env.ABLY_API_KEY });
-var server = http.createServer(app);
-/* MONGOOSE SETUP */
-var PORT = process.env.PORT || 6001;
-var MONGO_URL = process.env.MONGO_URL || "";
-app.use("/user", user_1.default);
-var connectWithRetry = function () { return __awaiter(void 0, void 0, void 0, function () {
+exports.newMessage = exports.getMessages = void 0;
+var Message_1 = require("../models/Message");
+var __1 = require("..");
+var JWT_SECRET = process.env.JWT_SECRET || "hard to guess string";
+var getMessages = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var messages, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, exports.ably.connection.once("connected")];
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, Message_1.default.find().lean()];
             case 1:
-                _a.sent();
-                exports.ably.channels.get("messages");
-                console.log("connecting");
-                mongoose_1.default
-                    .connect(MONGO_URL)
-                    .then(function () { return __awaiter(void 0, void 0, void 0, function () {
-                    return __generator(this, function (_a) {
-                        server.listen(PORT, function () { return console.log("Server Connected, Port: ".concat(PORT)); });
-                        return [2 /*return*/];
-                    });
-                }); })
-                    .catch(function (error) {
-                    console.log("".concat(error, " did not connect"));
-                    setTimeout(connectWithRetry, 3000);
-                });
-                return [2 /*return*/];
+                messages = _a.sent();
+                __1.ably.channels.get("messages").publish("messages", messages);
+                res.status(200).json(messages);
+                return [3 /*break*/, 3];
+            case 2:
+                error_1 = _a.sent();
+                res.status(500).json({ error: error_1.message });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
-connectWithRetry();
+exports.getMessages = getMessages;
+var newMessage = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var newMessage_1, messages, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                newMessage_1 = new Message_1.default(req.body);
+                return [4 /*yield*/, newMessage_1.save()];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, Message_1.default.find().lean()];
+            case 2:
+                messages = _a.sent();
+                __1.ably.channels.get("messages").publish("messages", messages);
+                res.status(201).json(newMessage_1);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                res.status(500).json({ error: error_2.message });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.newMessage = newMessage;
