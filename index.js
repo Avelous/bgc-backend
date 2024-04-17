@@ -36,31 +36,28 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ably = exports.app = exports.envPath = void 0;
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongoose_1 = require("mongoose");
 var cors = require("cors");
 var dotenv = require("dotenv");
 var helmet_1 = require("helmet");
-var morgan = require("morgan");
 var http = require("http");
 var Ably = require("ably");
 var path = require("path");
-exports.envPath = path.resolve(__dirname, "./.env");
-dotenv.config({ path: exports.envPath });
+var envPath = path.resolve(__dirname, "./.env");
+dotenv.config({ path: envPath });
 /* CONFIGURATIONS */
-exports.app = express();
-exports.app.use(express.json());
-exports.app.use((0, helmet_1.default)());
-exports.app.use(helmet_1.default.crossOriginResourcePolicy({ policy: "cross-origin" }));
-exports.app.use(morgan("common"));
-exports.app.use(bodyParser.json({ limit: "30mb" }));
-exports.app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-exports.app.use(cors());
+var app = express();
+app.use(express.json());
+app.use((0, helmet_1.default)());
+app.use(helmet_1.default.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(bodyParser.json({ limit: "30mb" }));
+app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
+app.use(cors());
 /**Ably Setup */
-exports.ably = new Ably.Realtime({ key: process.env.ABLY_API_KEY });
-var server = http.createServer(exports.app);
+var ably = new Ably.Realtime({ key: process.env.ABLY_API_KEY });
+var server = http.createServer(app);
 /* MONGOOSE SETUP */
 var PORT = process.env.PORT || 6001;
 var MONGO_URL = process.env.MONGO_URL || "";
@@ -71,21 +68,21 @@ var messageSchema = new mongoose_1.default.Schema({
     text: String,
 });
 var Message = mongoose_1.default.model("Message", messageSchema);
-var channel = exports.ably.channels.get("messages");
+var channel = ably.channels.get("messages");
 channel.attach();
 var connectWithRetry = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, exports.ably.connection.once("connected")];
+            case 0: return [4 /*yield*/, ably.connection.once("connected")];
             case 1:
                 _a.sent();
-                exports.ably.channels.get("messages");
+                ably.channels.get("messages");
                 console.log("connecting");
                 mongoose_1.default
                     .connect(MONGO_URL)
                     .then(function () { return __awaiter(void 0, void 0, void 0, function () {
                     return __generator(this, function (_a) {
-                        exports.app.listen(PORT, function () { return __awaiter(void 0, void 0, void 0, function () {
+                        app.listen(PORT, function () { return __awaiter(void 0, void 0, void 0, function () {
                             var messages;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
