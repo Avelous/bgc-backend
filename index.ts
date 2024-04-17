@@ -1,7 +1,7 @@
 import express = require("express");
 import * as bodyParser from "body-parser";
 import mongoose, { Error } from "mongoose";
-const cors = require('cors');
+const cors = require("cors");
 import * as dotenv from "dotenv";
 import helmet from "helmet";
 import * as morgan from "morgan";
@@ -17,12 +17,12 @@ declare global {
   }
 }
 
-export const envPath = path.resolve(__dirname, "./.env");
+const envPath = path.resolve(__dirname, "./.env");
 dotenv.config({ path: envPath });
 
 /* CONFIGURATIONS */
 
-export const app = express();
+const app = express();
 app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
@@ -33,7 +33,7 @@ app.use(cors());
 
 /**Ably Setup */
 
-export const ably = new Ably.Realtime({ key: process.env.ABLY_API_KEY });
+const ably = new Ably.Realtime({ key: process.env.ABLY_API_KEY });
 
 const server = http.createServer(app);
 /* MONGOOSE SETUP */
